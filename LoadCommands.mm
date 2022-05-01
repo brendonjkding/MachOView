@@ -920,6 +920,82 @@ using namespace std;
   MATCH_STRUCT(mach_header,imageOffset);
   if (mach_header->cputype == CPU_TYPE_I386 || mach_header->cputype == CPU_TYPE_X86_64)
   {
+    #define _STRUCT_X86_THREAD_STATE32  struct __darwin_i386_thread_state
+    _STRUCT_X86_THREAD_STATE32
+    {
+        unsigned int  __eax;
+        unsigned int  __ebx;
+        unsigned int  __ecx;
+        unsigned int  __edx;
+        unsigned int  __edi;
+        unsigned int  __esi;
+        unsigned int  __ebp;
+        unsigned int  __esp;
+        unsigned int  __ss;
+        unsigned int  __eflags;
+        unsigned int  __eip;
+        unsigned int  __cs;
+        unsigned int  __ds;
+        unsigned int  __es;
+        unsigned int  __fs;
+        unsigned int  __gs;
+    };
+    typedef _STRUCT_X86_THREAD_STATE32 x86_thread_state32_t;
+
+    #define _STRUCT_X86_THREAD_STATE64  struct __darwin_x86_thread_state64
+    _STRUCT_X86_THREAD_STATE64
+    {
+      __uint64_t  __rax;
+      __uint64_t  __rbx;
+      __uint64_t  __rcx;
+      __uint64_t  __rdx;
+      __uint64_t  __rdi;
+      __uint64_t  __rsi;
+      __uint64_t  __rbp;
+      __uint64_t  __rsp;
+      __uint64_t  __r8;
+      __uint64_t  __r9;
+      __uint64_t  __r10;
+      __uint64_t  __r11;
+      __uint64_t  __r12;
+      __uint64_t  __r13;
+      __uint64_t  __r14;
+      __uint64_t  __r15;
+      __uint64_t  __rip;
+      __uint64_t  __rflags;
+      __uint64_t  __cs;
+      __uint64_t  __fs;
+      __uint64_t  __gs;
+    };
+    typedef _STRUCT_X86_THREAD_STATE64 x86_thread_state64_t;
+
+    struct x86_state_hdr {
+      uint32_t        flavor;
+      uint32_t        count;
+    };
+    typedef struct x86_state_hdr x86_state_hdr_t;
+
+    struct x86_thread_state {
+      x86_state_hdr_t                 tsh;
+      union {
+        x86_thread_state32_t        ts32;
+        x86_thread_state64_t        ts64;
+      } uts;
+    };
+
+    #define x86_THREAD_STATE32              1
+    #define x86_FLOAT_STATE32               2
+    #define x86_EXCEPTION_STATE32           3
+    #define x86_THREAD_STATE64              4
+    #define x86_FLOAT_STATE64               5
+    #define x86_EXCEPTION_STATE64           6
+    #define x86_THREAD_STATE                7
+    #define x86_FLOAT_STATE                 8
+    #define x86_EXCEPTION_STATE             9
+    #define x86_DEBUG_STATE32               10
+    #define x86_DEBUG_STATE64               11
+    #define x86_DEBUG_STATE                 12
+
     MATCH_STRUCT(x86_thread_state,NSMaxRange(range))
     
     [dataController read_uint32:range lastReadHex:&lastReadHex];
