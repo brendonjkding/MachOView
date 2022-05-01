@@ -2,56 +2,55 @@
 #define CAPSTONE_ARM_H
 
 /* Capstone Disassembly Engine */
-/* By Nguyen Anh Quynh <aquynh@gmail.com>, 2013-2014 */
+/* By Nguyen Anh Quynh <aquynh@gmail.com>, 2013-2015 */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdint.h>
 #include "platform.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4201)
 #endif
 
-//> ARM shift type
+/// ARM shift type
 typedef enum arm_shifter {
 	ARM_SFT_INVALID = 0,
-	ARM_SFT_ASR,	// shift with immediate const
-	ARM_SFT_LSL,	// shift with immediate const
-	ARM_SFT_LSR,	// shift with immediate const
-	ARM_SFT_ROR,	// shift with immediate const
-	ARM_SFT_RRX,	// shift with immediate const
-	ARM_SFT_ASR_REG,	// shift with register
-	ARM_SFT_LSL_REG,	// shift with register
-	ARM_SFT_LSR_REG,	// shift with register
-	ARM_SFT_ROR_REG,	// shift with register
-	ARM_SFT_RRX_REG,	// shift with register
+	ARM_SFT_ASR,	///< shift with immediate const
+	ARM_SFT_LSL,	///< shift with immediate const
+	ARM_SFT_LSR,	///< shift with immediate const
+	ARM_SFT_ROR,	///< shift with immediate const
+	ARM_SFT_RRX,	///< shift with immediate const
+	ARM_SFT_ASR_REG,	///< shift with register
+	ARM_SFT_LSL_REG,	///< shift with register
+	ARM_SFT_LSR_REG,	///< shift with register
+	ARM_SFT_ROR_REG,	///< shift with register
+	ARM_SFT_RRX_REG,	///< shift with register
 } arm_shifter;
 
-//> ARM condition code
+/// ARM condition code
 typedef enum arm_cc {
 	ARM_CC_INVALID = 0,
-	ARM_CC_EQ,            // Equal                      Equal
-	ARM_CC_NE,            // Not equal                  Not equal, or unordered
-	ARM_CC_HS,            // Carry set                  >, ==, or unordered
-	ARM_CC_LO,            // Carry clear                Less than
-	ARM_CC_MI,            // Minus, negative            Less than
-	ARM_CC_PL,            // Plus, positive or zero     >, ==, or unordered
-	ARM_CC_VS,            // Overflow                   Unordered
-	ARM_CC_VC,            // No overflow                Not unordered
-	ARM_CC_HI,            // Unsigned higher            Greater than, or unordered
-	ARM_CC_LS,            // Unsigned lower or same     Less than or equal
-	ARM_CC_GE,            // Greater than or equal      Greater than or equal
-	ARM_CC_LT,            // Less than                  Less than, or unordered
-	ARM_CC_GT,            // Greater than               Greater than
-	ARM_CC_LE,            // Less than or equal         <, ==, or unordered
-	ARM_CC_AL             // Always (unconditional)     Always (unconditional)
+	ARM_CC_EQ,            ///< Equal                      Equal
+	ARM_CC_NE,            ///< Not equal                  Not equal, or unordered
+	ARM_CC_HS,            ///< Carry set                  >, ==, or unordered
+	ARM_CC_LO,            ///< Carry clear                Less than
+	ARM_CC_MI,            ///< Minus, negative            Less than
+	ARM_CC_PL,            ///< Plus, positive or zero     >, ==, or unordered
+	ARM_CC_VS,            ///< Overflow                   Unordered
+	ARM_CC_VC,            ///< No overflow                Not unordered
+	ARM_CC_HI,            ///< Unsigned higher            Greater than, or unordered
+	ARM_CC_LS,            ///< Unsigned lower or same     Less than or equal
+	ARM_CC_GE,            ///< Greater than or equal      Greater than or equal
+	ARM_CC_LT,            ///< Less than                  Less than, or unordered
+	ARM_CC_GT,            ///< Greater than               Greater than
+	ARM_CC_LE,            ///< Less than or equal         <, ==, or unordered
+	ARM_CC_AL             ///< Always (unconditional)     Always (unconditional)
 } arm_cc;
 
 typedef enum arm_sysreg {
-	//> Special registers for MSR
+	/// Special registers for MSR
 	ARM_SYSREG_INVALID = 0,
 
 	// SPSR* registers can be OR combined
@@ -75,14 +74,17 @@ typedef enum arm_sysreg {
 	ARM_SYSREG_IAPSR,
 	ARM_SYSREG_IAPSR_G,
 	ARM_SYSREG_IAPSR_NZCVQG,
+	ARM_SYSREG_IAPSR_NZCVQ,
 
 	ARM_SYSREG_EAPSR,
 	ARM_SYSREG_EAPSR_G,
 	ARM_SYSREG_EAPSR_NZCVQG,
+	ARM_SYSREG_EAPSR_NZCVQ,
 
 	ARM_SYSREG_XPSR,
 	ARM_SYSREG_XPSR_G,
 	ARM_SYSREG_XPSR_NZCVQG,
+	ARM_SYSREG_XPSR_NZCVQ,
 
 	ARM_SYSREG_IPSR,
 	ARM_SYSREG_EPSR,
@@ -95,10 +97,46 @@ typedef enum arm_sysreg {
 	ARM_SYSREG_BASEPRI_MAX,
 	ARM_SYSREG_FAULTMASK,
 	ARM_SYSREG_CONTROL,
+
+	// Banked Registers
+	ARM_SYSREG_R8_USR,
+	ARM_SYSREG_R9_USR,
+	ARM_SYSREG_R10_USR,
+	ARM_SYSREG_R11_USR,
+	ARM_SYSREG_R12_USR,
+	ARM_SYSREG_SP_USR,
+	ARM_SYSREG_LR_USR,
+	ARM_SYSREG_R8_FIQ,
+	ARM_SYSREG_R9_FIQ,
+	ARM_SYSREG_R10_FIQ,
+	ARM_SYSREG_R11_FIQ,
+	ARM_SYSREG_R12_FIQ,
+	ARM_SYSREG_SP_FIQ,
+	ARM_SYSREG_LR_FIQ,
+	ARM_SYSREG_LR_IRQ,
+	ARM_SYSREG_SP_IRQ,
+	ARM_SYSREG_LR_SVC,
+	ARM_SYSREG_SP_SVC,
+	ARM_SYSREG_LR_ABT,
+	ARM_SYSREG_SP_ABT,
+	ARM_SYSREG_LR_UND,
+	ARM_SYSREG_SP_UND,
+	ARM_SYSREG_LR_MON,
+	ARM_SYSREG_SP_MON,
+	ARM_SYSREG_ELR_HYP,
+	ARM_SYSREG_SP_HYP,
+
+	ARM_SYSREG_SPSR_FIQ,
+	ARM_SYSREG_SPSR_IRQ,
+	ARM_SYSREG_SPSR_SVC,
+	ARM_SYSREG_SPSR_ABT,
+	ARM_SYSREG_SPSR_UND,
+	ARM_SYSREG_SPSR_MON,
+	ARM_SYSREG_SPSR_HYP,
 } arm_sysreg;
 
-//> The memory barrier constants map directly to the 4-bit encoding of
-//> the option field for Memory Barrier operations.
+/// The memory barrier constants map directly to the 4-bit encoding of
+/// the option field for Memory Barrier operations.
 typedef enum arm_mem_barrier {
 	ARM_MB_INVALID = 0,
 	ARM_MB_RESERVED_0,
@@ -119,24 +157,24 @@ typedef enum arm_mem_barrier {
 	ARM_MB_SY,
 } arm_mem_barrier;
 
-//> Operand type for instruction's operands
+/// Operand type for instruction's operands
 typedef enum arm_op_type {
-	ARM_OP_INVALID = 0, // = CS_OP_INVALID (Uninitialized).
-	ARM_OP_REG, // = CS_OP_REG (Register operand).
-	ARM_OP_IMM, // = CS_OP_IMM (Immediate operand).
-	ARM_OP_MEM, // = CS_OP_MEM (Memory operand).
-	ARM_OP_FP,  // = CS_OP_FP (Floating-Point operand).
-	ARM_OP_CIMM = 64, // C-Immediate (coprocessor registers)
-	ARM_OP_PIMM, // P-Immediate (coprocessor registers)
-	ARM_OP_SETEND,	// operand for SETEND instruction
-	ARM_OP_SYSREG,	// MSR/MSR special register operand
+	ARM_OP_INVALID = 0, ///< = CS_OP_INVALID (Uninitialized).
+	ARM_OP_REG, ///< = CS_OP_REG (Register operand).
+	ARM_OP_IMM, ///< = CS_OP_IMM (Immediate operand).
+	ARM_OP_MEM, ///< = CS_OP_MEM (Memory operand).
+	ARM_OP_FP,  ///< = CS_OP_FP (Floating-Point operand).
+	ARM_OP_CIMM = 64, ///< C-Immediate (coprocessor registers)
+	ARM_OP_PIMM, ///< P-Immediate (coprocessor registers)
+	ARM_OP_SETEND,	///< operand for SETEND instruction
+	ARM_OP_SYSREG,	///< MSR/MRS special register operand
 } arm_op_type;
 
-//> Operand type for SETEND instruction
+/// Operand type for SETEND instruction
 typedef enum arm_setend_type {
-	ARM_SETEND_INVALID = 0,	// Uninitialized.
-	ARM_SETEND_BE,	// BE operand.
-	ARM_SETEND_LE, // LE operand
+	ARM_SETEND_INVALID = 0,	///< Uninitialized.
+	ARM_SETEND_BE,	///< BE operand.
+	ARM_SETEND_LE, ///< LE operand
 } arm_setend_type;
 
 typedef enum arm_cpsmode_type {
@@ -145,16 +183,16 @@ typedef enum arm_cpsmode_type {
 	ARM_CPSMODE_ID = 3
 } arm_cpsmode_type;
 
-//> Operand type for SETEND instruction
+/// Operand type for SETEND instruction
 typedef enum arm_cpsflag_type {
 	ARM_CPSFLAG_INVALID = 0,
 	ARM_CPSFLAG_F = 1,
 	ARM_CPSFLAG_I = 2,
 	ARM_CPSFLAG_A = 4,
-	ARM_CPSFLAG_NONE = 16,	// no flag
+	ARM_CPSFLAG_NONE = 16,	///< no flag
 } arm_cpsflag_type;
 
-//> Data type for elements of vector instructions.
+/// Data type for elements of vector instructions.
 typedef enum arm_vectordata_type {
 	ARM_VECTORDATA_INVALID = 0,
 
@@ -210,55 +248,7 @@ typedef enum arm_vectordata_type {
 	ARM_VECTORDATA_F64U32,	// f64.u32
 } arm_vectordata_type;
 
-// Instruction's operand referring to memory
-// This is associated with ARM_OP_MEM operand type above
-typedef struct arm_op_mem {
-	unsigned int base;	// base register
-	unsigned int index;	// index register
-	int scale;	// scale for index register (can be 1, or -1)
-	int disp;	// displacement/offset value
-} arm_op_mem;
-
-// Instruction operand
-typedef struct cs_arm_op {
-	int vector_index;	// Vector Index for some vector operands (or -1 if irrelevant)
-	struct {
-		arm_shifter type;
-		unsigned int value;
-	} shift;
-	arm_op_type type;	// operand type
-	union {
-		unsigned int reg;	// register value for REG/SYSREG operand
-		int32_t imm;			// immediate value for C-IMM, P-IMM or IMM operand
-		double fp;			// floating point value for FP operand
-		arm_op_mem mem;		// base/index/scale/disp value for MEM operand
-		arm_setend_type setend; // SETEND instruction's operand type
-	};
-	// in some instructions, an operand can be subtracted or added to
-	// the base register,
-	bool subtracted; // if TRUE, this operand is subtracted. otherwise, it is added.
-} cs_arm_op;
-
-// Instruction structure
-typedef struct cs_arm {
-	bool usermode;	// User-mode registers to be loaded (for LDM/STM instructions)
-	int vector_size; 	// Scalar size for vector instructions
-	arm_vectordata_type vector_data; // Data type for elements of vector instructions
-	arm_cpsmode_type cps_mode;	// CPS mode for CPS instruction
-	arm_cpsflag_type cps_flag;	// CPS mode for CPS instruction
-	arm_cc cc;			// conditional code for this insn
-	bool update_flags;	// does this insn update flags?
-	bool writeback;		// does this insn write-back?
-	arm_mem_barrier mem_barrier;	// Option for some memory barrier instructions
-
-	// Number of operands of this instruction, 
-	// or 0 when instruction has no operand.
-	uint8_t op_count;
-
-	cs_arm_op operands[36];	// operands for this instruction.
-} cs_arm;
-
-//> ARM registers
+/// ARM registers
 typedef enum arm_reg {
 	ARM_REG_INVALID = 0,
 	ARM_REG_APSR,
@@ -374,7 +364,7 @@ typedef enum arm_reg {
 
 	ARM_REG_ENDING,		// <-- mark the end of the list or registers
 
-	//> alias registers
+	// alias registers
 	ARM_REG_R13 = ARM_REG_SP,
 	ARM_REG_R14 = ARM_REG_LR,
 	ARM_REG_R15 = ARM_REG_PC,
@@ -385,7 +375,71 @@ typedef enum arm_reg {
 	ARM_REG_IP = ARM_REG_R12,
 } arm_reg;
 
-//> ARM instruction
+/// Instruction's operand referring to memory
+/// This is associated with ARM_OP_MEM operand type above
+typedef struct arm_op_mem {
+	arm_reg base;	///< base register
+	arm_reg index;	///< index register
+	int scale;	///< scale for index register (can be 1, or -1)
+	int disp;	///< displacement/offset value
+	/// left-shift on index register, or 0 if irrelevant
+	/// NOTE: this value can also be fetched via operand.shift.value
+	int lshift;
+} arm_op_mem;
+
+/// Instruction operand
+typedef struct cs_arm_op {
+	int vector_index;	///< Vector Index for some vector operands (or -1 if irrelevant)
+
+	struct {
+		arm_shifter type;
+		unsigned int value;
+	} shift;
+
+	arm_op_type type;	///< operand type
+
+	union {
+		int reg;	///< register value for REG/SYSREG operand
+		int32_t imm;			///< immediate value for C-IMM, P-IMM or IMM operand
+		double fp;			///< floating point value for FP operand
+		arm_op_mem mem;		///< base/index/scale/disp value for MEM operand
+		arm_setend_type setend; ///< SETEND instruction's operand type
+	};
+
+	/// in some instructions, an operand can be subtracted or added to
+	/// the base register,
+	/// if TRUE, this operand is subtracted. otherwise, it is added.
+	bool subtracted;
+
+	/// How is this operand accessed? (READ, WRITE or READ|WRITE)
+	/// This field is combined of cs_ac_type.
+	/// NOTE: this field is irrelevant if engine is compiled in DIET mode.
+	uint8_t access;
+
+	/// Neon lane index for NEON instructions (or -1 if irrelevant)
+	int8_t neon_lane;
+} cs_arm_op;
+
+/// Instruction structure
+typedef struct cs_arm {
+	bool usermode;	///< User-mode registers to be loaded (for LDM/STM instructions)
+	int vector_size; 	///< Scalar size for vector instructions
+	arm_vectordata_type vector_data; ///< Data type for elements of vector instructions
+	arm_cpsmode_type cps_mode;	///< CPS mode for CPS instruction
+	arm_cpsflag_type cps_flag;	///< CPS mode for CPS instruction
+	arm_cc cc;			///< conditional code for this insn
+	bool update_flags;	///< does this insn update flags?
+	bool writeback;		///< does this insn write-back?
+	arm_mem_barrier mem_barrier;	///< Option for some memory barrier instructions
+
+	/// Number of operands of this instruction,
+	/// or 0 when instruction has no operand.
+	uint8_t op_count;
+
+	cs_arm_op operands[36];	///< operands for this instruction.
+} cs_arm;
+
+/// ARM instruction
 typedef enum arm_insn {
 	ARM_INS_INVALID = 0,
 
@@ -423,6 +477,7 @@ typedef enum arm_insn {
 	ARM_INS_DMB,
 	ARM_INS_DSB,
 	ARM_INS_EOR,
+	ARM_INS_ERET,
 	ARM_INS_VMOV,
 	ARM_INS_FLDMDBX,
 	ARM_INS_FLDMIAX,
@@ -431,6 +486,7 @@ typedef enum arm_insn {
 	ARM_INS_FSTMIAX,
 	ARM_INS_HINT,
 	ARM_INS_HLT,
+	ARM_INS_HVC,
 	ARM_INS_ISB,
 	ARM_INS_LDA,
 	ARM_INS_LDAB,
@@ -801,18 +857,14 @@ typedef enum arm_insn {
 	ARM_INS_IT,
 	ARM_INS_LSL,
 	ARM_INS_LSR,
-	ARM_INS_ASRS,
-	ARM_INS_LSRS,
 	ARM_INS_ORN,
 	ARM_INS_ROR,
 	ARM_INS_RRX,
-	ARM_INS_SUBS,
 	ARM_INS_SUBW,
 	ARM_INS_TBB,
 	ARM_INS_TBH,
 	ARM_INS_CBNZ,
 	ARM_INS_CBZ,
-	ARM_INS_MOVS,
 	ARM_INS_POP,
 	ARM_INS_PUSH,
 
@@ -829,15 +881,19 @@ typedef enum arm_insn {
 	ARM_INS_ENDING,	// <-- mark the end of the list of instructions
 } arm_insn;
 
-//> Group of ARM instructions
+/// Group of ARM instructions
 typedef enum arm_insn_group {
-	ARM_GRP_INVALID = 0, // = CS_GRP_INVALID
+	ARM_GRP_INVALID = 0, ///< = CS_GRP_INVALID
 
-	//> Generic groups
+	// Generic groups
 	// all jump instructions (conditional+direct+indirect jumps)
-	ARM_GRP_JUMP,	// = CS_GRP_JUMP
+	ARM_GRP_JUMP,	///< = CS_GRP_JUMP
+	ARM_GRP_CALL,	///< = CS_GRP_CALL
+	ARM_GRP_INT = 4, ///< = CS_GRP_INT
+	ARM_GRP_PRIVILEGE = 6, ///< = CS_GRP_PRIVILEGE
+	ARM_GRP_BRANCH_RELATIVE, ///< = CS_GRP_BRANCH_RELATIVE
 
-	//> Architecture-specific groups
+	// Architecture-specific groups
 	ARM_GRP_CRYPTO = 128,
 	ARM_GRP_DATABARRIER,
 	ARM_GRP_DIVIDE,
@@ -869,6 +925,7 @@ typedef enum arm_insn_group {
 	ARM_GRP_CRC,
 	ARM_GRP_DPVFP,
 	ARM_GRP_V6M,
+	ARM_GRP_VIRTUALIZATION,
 
 	ARM_GRP_ENDING,
 } arm_insn_group;

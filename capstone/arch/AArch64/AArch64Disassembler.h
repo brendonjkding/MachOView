@@ -1,10 +1,8 @@
 /* Capstone Disassembly Engine */
-/* By Nguyen Anh Quynh <aquynh@gmail.com>, 2013-2014 */
+/* By Nguyen Anh Quynh <aquynh@gmail.com>, 2013-2015 */
 
 #ifndef CS_AARCH64_DISASSEMBLER_H
 #define CS_AARCH64_DISASSEMBLER_H
-
-#include <stdint.h>
 
 #include "../../include/capstone.h"
 #include "../../MCRegisterInfo.h"
